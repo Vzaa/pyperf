@@ -1,0 +1,49 @@
+import json
+import time
+import requests
+
+URLS = {'info': '/get_info',
+        'stop': '/stop',
+        'tcp_start': '/tcp_start',
+        'udp_start': '/udp_start',
+        'tcp_server': '/tcp_server',
+        'udp_server': '/udp_server'}
+
+
+def udp_server_start(hostname, port):
+    url = 'http://' + hostname + ':' + str(port) + URLS['udp_server']
+    serve_req = requests.get(url)
+    serv_handle = json.loads(serve_req.text)
+    #print serv_handle['id_no']
+    return serv_handle['id_no']
+
+
+def udp_client_start(hostname, port, dest, dur, bw):
+    url = 'http://' + hostname + ':' + str(port) + URLS['udp_start']
+    params = {'dest': dest, 'dur': dur, 'bw': bw}
+    client_req = requests.get(url, params=params)
+    cli_handle = json.loads(client_req.text)
+    return cli_handle['id_no']
+
+
+def get_info(hostname, port, id_no):
+    url = 'http://' + hostname + ':' + str(port) + URLS['info']
+    params = {'id_no': id_no}
+    info_req = requests.get(url, params=params)
+    info = json.loads(info_req.text)
+    return info
+
+
+def stop(hostname, port, id_no):
+    url = 'http://' + hostname + ':' + str(port) + URLS['stop']
+    params = {'id_no': id_no}
+    info_req = requests.get(url, params=params)
+    info = json.loads(info_req.text)
+    return info
+
+
+def main():
+    run_udp()
+
+if __name__ == '__main__':
+    main()

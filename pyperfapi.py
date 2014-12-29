@@ -2,6 +2,7 @@ import json
 import requests
 
 URLS = {'info': '/get_info',
+        'log': '/get_log',
         'stop': '/stop',
         'tcp_start': '/tcp_start',
         'udp_start': '/udp_start',
@@ -47,6 +48,14 @@ def get_info(hostname, port, id_no):
     info_req = requests.get(url, params=params)
     info = json.loads(info_req.text)
     return info
+
+
+def get_log(hostname, port, id_no):
+    url = 'http://' + hostname + ':' + str(port) + URLS['log']
+    params = {'id_no': id_no}
+    log_req = requests.get(url, params=params)
+    log = json.loads(log_req.text)
+    return log
 
 
 def stop(hostname, port, id_no):

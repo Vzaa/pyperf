@@ -25,6 +25,15 @@ class Iperftcp(object):
                 'duration': self._duration,
                 'destination': self._destination,
                 'pairs': self._pairs,
+                'running': self.running
+                }
+
+    def get_log(self):
+        self.log = self._handle.get_output()
+        return {'type': 'tcp',
+                'duration': self._duration,
+                'destination': self._destination,
+                'pairs': self._pairs,
                 'log': self.log,
                 'running': self.running
                 }

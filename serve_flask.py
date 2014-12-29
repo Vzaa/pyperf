@@ -31,6 +31,18 @@ def get_info():
             return Response('{}', mimetype="application/json")
 
 
+@app.route("/get_log", methods=['GET'])
+def get_log():
+    global JOBLIST
+    if ('id_no' in request.args):
+        id_no = int(request.args['id_no'])
+        if id_no in JOBLIST:
+            dat = JOBLIST[id_no].get_log()
+            return Response(json.dumps(dat), mimetype="application/json")
+        else:
+            return Response('{}', mimetype="application/json")
+
+
 @app.route("/stop", methods=['GET'])
 def stop():
     global JOBLIST

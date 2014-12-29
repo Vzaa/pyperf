@@ -18,9 +18,25 @@ def udp_server_start(hostname, port):
     return serv_handle['id_no']
 
 
+def tcp_server_start(hostname, port):
+    url = 'http://' + hostname + ':' + str(port) + URLS['tcp_server']
+    serve_req = requests.get(url)
+    serv_handle = json.loads(serve_req.text)
+    #print serv_handle['id_no']
+    return serv_handle['id_no']
+
+
 def udp_client_start(hostname, port, dest, dur, bw):
     url = 'http://' + hostname + ':' + str(port) + URLS['udp_start']
     params = {'dest': dest, 'dur': dur, 'bw': bw}
+    client_req = requests.get(url, params=params)
+    cli_handle = json.loads(client_req.text)
+    return cli_handle['id_no']
+
+
+def tcp_client_start(hostname, port, dest, dur, pair):
+    url = 'http://' + hostname + ':' + str(port) + URLS['tcp_start']
+    params = {'dest': dest, 'dur': dur, 'pair': pair}
     client_req = requests.get(url, params=params)
     cli_handle = json.loads(client_req.text)
     return cli_handle['id_no']
@@ -43,7 +59,7 @@ def stop(hostname, port, id_no):
 
 
 def main():
-    run_udp()
+    pass
 
 if __name__ == '__main__':
     main()

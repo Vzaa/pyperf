@@ -49,8 +49,8 @@ def tcp_start():
     global JOBLIST
     global ID_NO
 
-    if ('dest' in request.args) and ('dur' in request.args):
-        newjob = Iperftcp(request.args['dest'], int(request.args['dur']))
+    if ('dest' in request.args) and ('dur' in request.args) and ('pair' in request.args):
+        newjob = Iperftcp(request.args['dest'], int(request.args['dur']), int(request.args['pair']))
         newjob.start()
         JOBLIST[ID_NO] = newjob
         ret = {'result': 'success', 'id_no': ID_NO}

@@ -3,8 +3,8 @@ import pyperfapi as py
 
 
 def main():
-    serv_id = py.udp_server_start('localhost', 4444)
-    cli_id = py.udp_client_start('localhost', 4444, 'localhost', 10, 50)
+    serv_id = py.tcp_server_start('localhost', 4444)
+    cli_id = py.tcp_client_start('localhost', 4444, 'localhost', 10, 5)
 
     while True:
         cli_info = py.get_info('localhost', 4444, cli_id)

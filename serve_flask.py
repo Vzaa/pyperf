@@ -52,6 +52,10 @@ def stop():
             JOBLIST[id_no].stop()
             ret = {'result': 'success'}
             return Response(json.dumps(ret), mimetype="application/json")
+        elif id_no == -1:
+            for key in JOBLIST:
+                if JOBLIST[key].running:
+                    JOBLIST[key].stop()
         else:
             return Response('{}', mimetype="application/json")
 

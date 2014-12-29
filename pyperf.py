@@ -20,7 +20,6 @@ class Iperftcp(object):
         self.log = self._handle.get_output()
 
     def get_state(self):
-        self.log = self._handle.get_output()
         return {'type': 'tcp',
                 'duration': self._duration,
                 'destination': self._destination,

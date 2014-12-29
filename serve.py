@@ -2,8 +2,6 @@ import json
 import web
 from iperfhandle import IperfTcp
 
-from flask import Flask
-app = Flask(__name__)
 
 urls = ('/index', 'Index',
         '/getlist.json', 'Getlistjson')

@@ -56,6 +56,7 @@ def stop():
             for key in JOBLIST:
                 if JOBLIST[key].running:
                     JOBLIST[key].stop()
+            return Response('{}', mimetype="application/json")
         else:
             return Response('{}', mimetype="application/json")
 

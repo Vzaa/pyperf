@@ -66,6 +66,14 @@ class Iperfudp(object):
         self.log = self._handle.get_output()
 
     def get_state(self):
+        return {'type': 'udp',
+                'duration': self._duration,
+                'destination': self._destination,
+                'bw': self._bw,
+                'running': self.running
+                }
+
+    def get_log(self):
         self.log = self._handle.get_output()
         return {'type': 'udp',
                 'duration': self._duration,
@@ -107,6 +115,11 @@ class Iperfs(object):
         self.log = self._handle.get_output()
 
     def get_state(self):
+        return {'type': self._stype,
+                'running': self.running
+                }
+
+    def get_log(self):
         self.log = self._handle.get_output()
         return {'type': self._stype,
                 'log': self.log,

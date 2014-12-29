@@ -1,22 +1,22 @@
 import time
-import pyperfapi as py
+import pyperfapi as perf
 
 
 def main():
-    serv_id = py.tcp_server_start('localhost', 4444)
-    cli_id = py.tcp_client_start('localhost', 4444, 'localhost', 10, 5)
+    serv_id = perf.tcp_server_start('localhost', 4444)
+    cli_id = perf.tcp_client_start('localhost', 4444, 'localhost', 10, 5)
 
     while True:
-        cli_info = py.get_info('localhost', 4444, cli_id)
+        cli_info = perf.get_info('localhost', 4444, cli_id)
         if cli_info['running']:
             time.sleep(1)
         else:
             break
 
-    py.stop('localhost', 4444, serv_id)
+    perf.stop('localhost', 4444, serv_id)
 
-    cli_info = py.get_info('localhost', 4444, cli_id)
-    serv_info = py.get_info('localhost', 4444, serv_id)
+    cli_info = perf.get_info('localhost', 4444, cli_id)
+    serv_info = perf.get_info('localhost', 4444, serv_id)
 
     for line in cli_info['log']:
         print line,

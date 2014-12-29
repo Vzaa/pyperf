@@ -137,15 +137,7 @@ class Iperfs(object):
 
 
 def main():
-    """TODO: Docstring for main.
-    :returns: TODO
-
-    """
-    asd = Iperftcp('localhost', 5)
-    asd.start()
-    while asd.running:
-        pass
-    print asd.log
+    pass
 
 if __name__ == '__main__':
     main()

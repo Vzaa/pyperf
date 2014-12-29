@@ -48,18 +48,7 @@ class Bopen(object):
 
 
 def main():
-    """main"""
-    handle = Bopen(['iperf',
-                    '-c',
-                    'localhost',
-                    '-i',
-                    '1', ])
-    handle.start()
-
-    while handle.running:
-        time.sleep(3)
-        print handle.get_output()[-1]
-        handle.stop()
+    pass
 
 if __name__ == '__main__':
     main()

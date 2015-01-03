@@ -34,6 +34,9 @@ class Bopen(object):
                 self.lock.release()
             else:
                 self.running = False
+                self.proc.stderr.close()
+                self.proc.stdin.close()
+                self.proc.stdout.close()
                 self.proc.wait()
 
                 if self._callback is not None:

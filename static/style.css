@@ -1,0 +1,16 @@
+.btn {
+    width:80%;
+}
+td {
+    text-align: center;
+    vertical-align: middle;
+}
+th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+input {
+    width: 150px;
+    text-align: center;
+}

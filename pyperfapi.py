@@ -10,33 +10,35 @@ URLS = {'info': '/get_info',
         'udp_server': '/udp_server'}
 
 
-def udp_server_start(hostname, port):
+def udp_server_start(hostname, port, name=''):
     url = 'http://' + hostname + ':' + str(port) + URLS['udp_server']
-    serve_req = requests.get(url)
+    params = {'name': name}
+    serve_req = requests.get(url, params=params)
     serv_handle = json.loads(serve_req.text)
     #print serv_handle['id_no']
     return serv_handle['id_no']
 
 
-def tcp_server_start(hostname, port):
+def tcp_server_start(hostname, port, name=''):
     url = 'http://' + hostname + ':' + str(port) + URLS['tcp_server']
-    serve_req = requests.get(url)
+    params = {'name': name}
+    serve_req = requests.get(url, params=params)
     serv_handle = json.loads(serve_req.text)
     #print serv_handle['id_no']
     return serv_handle['id_no']
 
 
-def udp_client_start(hostname, port, dest, dur, bw):
+def udp_client_start(hostname, port, dest, dur, bw, name=''):
     url = 'http://' + hostname + ':' + str(port) + URLS['udp_start']
-    params = {'dest': dest, 'dur': dur, 'bw': bw}
+    params = {'dest': dest, 'dur': dur, 'bw': bw, 'name': name}
     client_req = requests.get(url, params=params)
     cli_handle = json.loads(client_req.text)
     return cli_handle['id_no']
 
 
-def tcp_client_start(hostname, port, dest, dur, pair):
+def tcp_client_start(hostname, port, dest, dur, pair, name=''):
     url = 'http://' + hostname + ':' + str(port) + URLS['tcp_start']
-    params = {'dest': dest, 'dur': dur, 'pair': pair}
+    params = {'dest': dest, 'dur': dur, 'pair': pair, 'name': name}
     client_req = requests.get(url, params=params)
     cli_handle = json.loads(client_req.text)
     return cli_handle['id_no']

@@ -1,5 +1,5 @@
 import json
-from pyperf import Iperftcp, Iperfudp, Iperfs
+from pyperf import Iperftcp, Iperfudp, Iperftcps, Iperfudps
 from flask import Flask, request, session, g, redirect, url_for, \
     abort, render_template, flash, Response, jsonify
 
@@ -18,11 +18,10 @@ def ipc_sh():
         if cmd == 'udp_listener_list':
             ret['udp_listeners'] = []
             for key in JOBLIST:
-                if JOBLIST[key].running and JOBLIST[key].get_type() == 'udp_server':
+                if JOBLIST[key].is_running() and JOBLIST[key].get_type() == 'udp_server':
                     ret['udp_listeners'].append({'port': JOBLIST[key].get_port()})
             return jsonify(ret)
     return jsonify({})
-
 
 
 @app.route("/jobs", methods=['GET'])
@@ -53,7 +52,7 @@ def get_parsed():
     if ('id_no' in request.args):
         id_no = int(request.args['id_no'])
         if id_no in JOBLIST:
-            dat = JOBLIST[id_no].get_parsed()
+            dat = JOBLIST[id_no].get_parsed_dict()
             return jsonify(dat)
         else:
             return jsonify({})
@@ -65,7 +64,7 @@ def get_log():
     if ('id_no' in request.args):
         id_no = int(request.args['id_no'])
         if id_no in JOBLIST:
-            dat = JOBLIST[id_no].get_log()
+            dat = JOBLIST[id_no].get_log_dict()
             return jsonify(dat)
         else:
             return jsonify({})
@@ -82,7 +81,7 @@ def stop():
             return jsonify(ret)
         elif id_no == -1:
             for key in JOBLIST:
-                if JOBLIST[key].running:
+                if JOBLIST[key].is_running():
                     JOBLIST[key].stop()
             return jsonify({})
         else:
@@ -95,7 +94,8 @@ def tcp_start():
     global ID_NO
 
     if ('dest' in request.args) and ('dur' in request.args) and ('pair' in request.args):
-        newjob = Iperftcp(request.args['dest'], int(request.args['dur']), int(request.args['pair']), name=request.args['name'])
+        newjob = Iperftcp(request.args['dest'], int(request.args['dur']),
+                          int(request.args['pair']), name=request.args['name'])
         newjob.start()
         JOBLIST[ID_NO] = newjob
         ret = {'result': 'success', 'id_no': ID_NO}
@@ -112,7 +112,8 @@ def udp_start():
     global ID_NO
 
     if ('dest' in request.args) and ('dur' in request.args) and ('bw' in request.args):
-        newjob = Iperfudp(request.args['dest'], int(request.args['dur']), int(request.args['bw']), name=request.args['name'])
+        newjob = Iperfudp(request.args['dest'], int(request.args['dur']),
+                          int(request.args['bw']), name=request.args['name'])
         newjob.start()
         JOBLIST[ID_NO] = newjob
         ret = {'result': 'success', 'id_no': ID_NO}
@@ -128,7 +129,7 @@ def udp_server():
     global JOBLIST
     global ID_NO
 
-    newjob = Iperfs(stype='udps', name=request.args['name'])
+    newjob = Iperfudps(name=request.args['name'])
     newjob.start()
     JOBLIST[ID_NO] = newjob
     ret = {'result': 'success', 'id_no': ID_NO}
@@ -141,7 +142,7 @@ def tcp_server():
     global JOBLIST
     global ID_NO
 
-    newjob = Iperfs(stype='tcps', name=request.args['name'])
+    newjob = Iperftcps(name=request.args['name'])
     newjob.start()
     JOBLIST[ID_NO] = newjob
     ret = {'result': 'success', 'id_no': ID_NO}

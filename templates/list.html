@@ -54,9 +54,8 @@
                     <tr> 
                         <td rowspan=2>{{ item }}</td>
                         <td>{{ joblist[item].get_name() }}</td>
-                        <td>{{ joblist[item].running }}</td>
+                        <td>{{ joblist[item].is_running() }}</td>
                         <td><button type="button" onclick="do_action('/stop?id_no={{ item }}')" class="btn btn-danger">Stop</button></td>
-                            <!--<td><button type="button" onclick="plot_item({{ item }}, {{joblist[item].get_parsed()}})" class="btn">Plot</button></td>-->
                             <td><button type="button" onclick="plot_item_json({{ item }})" class="btn btn-default">Plot</button></td>
                     </tr> 
                     <tr> 

@@ -3,7 +3,6 @@ from bopen import Bopen
 
 
 def parse_udp(lines):
-    """parse udp iperf log, returns avg. val times sample cnt"""
     dat = []
 
     idx = 0
@@ -18,11 +17,68 @@ def parse_udp(lines):
     return dat
 
 
-class Iperftcp(object):
-    def __init__(self, destination, duration=10, pairs=1, name=''):
-        self.running = False
-        self.log = []
+class Iperfjob(object):
+    def __init__(self, name='', port=5001):
+        self._running = False
+        self._log = []
         self._name = name
+        self._port = port
+        self._handle = None
+        self._type = ''
+        self._log_parser = parse_udp
+
+    def get_port(self):
+        return self._port
+
+    def get_type(self):
+        return self._type
+
+    def _done(self):
+        self._running = False
+        self._log = self._handle.get_output()
+
+    def start(self):
+        self._running = True
+        self._handle.start()
+
+
+    def get_name(self):
+        return self._name
+
+    def stop(self):
+        self._log = self._handle.get_output()
+        if self._running:
+            self._running = False
+            self._handle.stop()
+
+    def get_log(self):
+        self._log = self._handle.get_output()
+        return self._log
+
+    def get_parsed_dict(self):
+        return {'tput': self._log_parser(self.get_log()),
+                'running': self._running}
+
+    def get_log_dict(self):
+        self._log = self._handle.get_output()
+        return {'type': self._type,
+                'log': self._log,
+                'running': self._running
+                }
+
+    def get_state(self):
+        return {'type': self._type,
+                'running': self._running
+                }
+
+    def is_running(self):
+        return self._running
+
+
+class Iperftcp(Iperfjob):
+    def __init__(self, destination, duration=10, pairs=1, name=''):
+        Iperfjob.__init__(self, name=name)
+        self._type = 'tcp_client'
         self._duration = duration
         self._destination = destination
         self._pairs = pairs
@@ -32,57 +88,13 @@ class Iperftcp(object):
                               '-t', str(duration),
                               '-i', '1',
                               '-f', 'm'], self._done)
-    def get_type(self):
-        return 'tcp_client'
-
-    def get_port(self):
-        return 5001
-
-    def _done(self):
-        self.running = False
-        self.log = self._handle.get_output()
-
-    def get_state(self):
-        return {'type': 'tcp',
-                'duration': self._duration,
-                'destination': self._destination,
-                'pairs': self._pairs,
-                'running': self.running
-                }
-
-    def get_log(self):
-        self.log = self._handle.get_output()
-        return {'type': 'tcp',
-                'duration': self._duration,
-                'destination': self._destination,
-                'pairs': self._pairs,
-                'log': self.log,
-                'running': self.running
-                }
-
-    def get_parsed(self):
-        return {'tput': parse_udp(self.get_log()['log']), 'running': self.running}
-
-    def get_name(self):
-        return self._name
-
-    def start(self):
-        self.running = True
-        self._handle.start()
-
-    def stop(self):
-        self.log = self._handle.get_output()
-        if self.running:
-            self.running = False
-            self._handle.stop()
 
 
-class Iperfudp(object):
-    def __init__(self, destination, duration=10, bw=1, port='default', name=''):
-        self.running = False
-        self.log = []
-        self._name = name
-        self._port = port
+class Iperfudp(Iperfjob):
+    def __init__(self, destination, duration=10, bw=1,
+                 name=''):
+        Iperfjob.__init__(self, name=name)
+        self._type = 'udp_client'
         self._duration = duration
         self._destination = destination
         self._bw = bw
@@ -93,109 +105,26 @@ class Iperfudp(object):
                               '-i', '1',
                               '-f', 'm'], self._done)
 
-    def get_type(self):
-        return 'udp_client'
 
-    def get_port(self):
-        return 5001
-
-    def _done(self):
-        self.running = False
-        self.log = self._handle.get_output()
-
-    def get_state(self):
-        return {'type': 'udp',
-                'duration': self._duration,
-                'destination': self._destination,
-                'bw': self._bw,
-                'running': self.running
-                }
-
-    def get_log(self):
-        self.log = self._handle.get_output()
-        return {'type': 'udp',
-                'duration': self._duration,
-                'destination': self._destination,
-                'bw': self._bw,
-                'log': self.log,
-                'running': self.running
-                }
-
-    def get_parsed(self):
-        return {'tput': parse_udp(self.get_log()['log']), 'running': self.running}
-
-    def get_name(self):
-        return self._name
-
-    def start(self):
-        self.running = True
-        self._handle.start()
-
-    def stop(self):
-        self.log = self._handle.get_output()
-        if self.running:
-            self.running = False
-            self._handle.stop()
+class Iperfudps(Iperfjob):
+    def __init__(self, name=''):
+        Iperfjob.__init__(self, name=name)
+        self._type = 'udp_server'
+        self._handle = Bopen(['iperf',
+                              '-s',
+                              '-u',
+                              '-i', '1',
+                              '-f', 'm'], self._done)
 
 
-class Iperfs(object):
-    def __init__(self, stype='tcps', name=''):
-        self.running = False
-        self._name = name
-        self.log = []
-        self._stype = stype
-        if stype == 'tcps':
-            self._handle = Bopen(['iperf',
-                                  '-s',
-                                  '-i', '1',
-                                  '-f', 'm'], self._done)
-        elif stype == 'udps':
-            self._handle = Bopen(['iperf',
-                                  '-s',
-                                  '-u',
-                                  '-i', '1',
-                                  '-f', 'm'], self._done)
-
-    def _done(self):
-        self.running = False
-        self.log = self._handle.get_output()
-
-    def get_type(self):
-        if self._stype == 'tcps':
-            return 'tcp_server'
-        else:
-            return 'udp_server'
-
-    def get_port(self):
-        return 5001
-
-    def get_state(self):
-        return {'type': self._stype,
-                'running': self.running
-                }
-
-    def get_log(self):
-        self.log = self._handle.get_output()
-        return {'type': self._stype,
-                'log': self.log,
-                'running': self.running
-                }
-
-    def get_parsed(self):
-        return {'tput': parse_udp(self.get_log()['log']), 'running': self.running}
-
-    def get_name(self):
-        return self._name
-
-    def start(self):
-        self.running = True
-        self._handle.start()
-
-    def stop(self):
-        self.log = self._handle.get_output()
-        if self.running:
-            self.running = False
-            self._handle.stop()
+class Iperftcps(Iperfjob):
+    def __init__(self, name=''):
+        Iperfjob.__init__(self, name=name)
+        self._type = 'tcp_server'
+        self._handle = Bopen(['iperf',
+                              '-s',
+                              '-i', '1',
+                              '-f', 'm'], self._done)
 
 
 def main():

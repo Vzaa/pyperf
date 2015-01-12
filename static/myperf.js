@@ -4,10 +4,10 @@ function do_action(url)
         url: url,
         dataType: 'json',
         success: function(data){
-            console.log('success');
-            console.log(data);
-            console.log(url);
-            timer = setTimeout('fill_stuff()', 200);
+            //console.log('success');
+            //console.log(data);
+            //console.log(url);
+            //timer = setTimeout('fill_stuff()', 200);
         },
         error: function(  jqXHR, textStatus,  errorThrown ) {
             console.log(errorThrown);

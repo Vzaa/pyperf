@@ -1,5 +1,9 @@
 import re
+import redis
+import json
 from bopen import Bopen
+
+red = redis.StrictRedis()
 
 
 def parse_udp(lines):
@@ -18,9 +22,11 @@ def parse_udp(lines):
 
 
 class Iperfjob(object):
-    def __init__(self, name='', port=5001):
+    def __init__(self, id_no, name='', port=5001):
         self._running = False
+        self._quit = False
         self._log = []
+        self._id_no = id_no
         self._name = name
         self._port = port
         self._handle = None
@@ -36,6 +42,10 @@ class Iperfjob(object):
     def _done(self):
         self._running = False
         self._log = self._handle.get_output()
+        red.set('log:%s'%self._id_no, ''.join(self._log))
+        red.set('name:%s'%self._id_no, self._name)
+        red.set('type:%s'%self._id_no, self._type)
+        self._quit = True
 
     def start(self):
         self._running = True
@@ -43,7 +53,12 @@ class Iperfjob(object):
 
 
     def get_name(self):
-        return self._name
+        name_str = ''
+        props = json.loads(self._name)
+        for key in props:
+            name_str += '%s -> %s '%(key, props[key])
+        #return self._name
+        return name_str
 
     def stop(self):
         self._log = self._handle.get_output()
@@ -74,10 +89,13 @@ class Iperfjob(object):
     def is_running(self):
         return self._running
 
+    def did_quit(self):
+        return self._quit
+
 
 class Iperftcp(Iperfjob):
-    def __init__(self, destination, duration=10, pairs=1, name=''):
-        Iperfjob.__init__(self, name=name)
+    def __init__(self, id_no, destination, duration=10, pairs=1, name=''):
+        Iperfjob.__init__(self, id_no, name=name)
         self._type = 'tcp_client'
         self._duration = duration
         self._destination = destination
@@ -91,9 +109,9 @@ class Iperftcp(Iperfjob):
 
 
 class Iperfudp(Iperfjob):
-    def __init__(self, destination, duration=10, bw=1,
+    def __init__(self, id_no, destination, duration=10, bw=1,
                  name=''):
-        Iperfjob.__init__(self, name=name)
+        Iperfjob.__init__(self, id_no, name=name)
         self._type = 'udp_client'
         self._duration = duration
         self._destination = destination
@@ -107,8 +125,8 @@ class Iperfudp(Iperfjob):
 
 
 class Iperfudps(Iperfjob):
-    def __init__(self, name=''):
-        Iperfjob.__init__(self, name=name)
+    def __init__(self, id_no, name=''):
+        Iperfjob.__init__(self, id_no, name=name)
         self._type = 'udp_server'
         self._handle = Bopen(['iperf',
                               '-s',
@@ -118,8 +136,8 @@ class Iperfudps(Iperfjob):
 
 
 class Iperftcps(Iperfjob):
-    def __init__(self, name=''):
-        Iperfjob.__init__(self, name=name)
+    def __init__(self, id_no, name=''):
+        Iperfjob.__init__(self, id_no, name=name)
         self._type = 'tcp_server'
         self._handle = Bopen(['iperf',
                               '-s',

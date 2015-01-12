@@ -10,35 +10,35 @@ URLS = {'info': '/get_info',
         'udp_server': '/udp_server'}
 
 
-def udp_server_start(hostname, port, name=''):
+def udp_server_start(hostname, port, name=dict()):
     url = 'http://' + hostname + ':' + str(port) + URLS['udp_server']
-    params = {'name': name}
+    params = {'name': json.dumps(name)}
     serve_req = requests.get(url, params=params, timeout=30)
     serv_handle = json.loads(serve_req.text)
     #print serv_handle['id_no']
     return serv_handle['id_no']
 
 
-def tcp_server_start(hostname, port, name=''):
+def tcp_server_start(hostname, port, name=dict()):
     url = 'http://' + hostname + ':' + str(port) + URLS['tcp_server']
-    params = {'name': name}
+    params = {'name': json.dumps(name)}
     serve_req = requests.get(url, params=params, timeout=30)
     serv_handle = json.loads(serve_req.text)
     #print serv_handle['id_no']
     return serv_handle['id_no']
 
 
-def udp_client_start(hostname, port, dest, dur, bw, name=''):
+def udp_client_start(hostname, port, dest, dur, bw, name=dict()):
     url = 'http://' + hostname + ':' + str(port) + URLS['udp_start']
-    params = {'dest': dest, 'dur': dur, 'bw': bw, 'name': name}
+    params = {'dest': dest, 'dur': dur, 'bw': bw, 'name': json.dumps(name)}
     client_req = requests.get(url, params=params, timeout=30)
     cli_handle = json.loads(client_req.text)
     return cli_handle['id_no']
 
 
-def tcp_client_start(hostname, port, dest, dur, pair, name=''):
+def tcp_client_start(hostname, port, dest, dur, pair, name=dict()):
     url = 'http://' + hostname + ':' + str(port) + URLS['tcp_start']
-    params = {'dest': dest, 'dur': dur, 'pair': pair, 'name': name}
+    params = {'dest': dest, 'dur': dur, 'pair': pair, 'name': json.dumps(name)}
     client_req = requests.get(url, params=params, timeout=30)
     cli_handle = json.loads(client_req.text)
     return cli_handle['id_no']

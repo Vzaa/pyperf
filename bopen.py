@@ -15,7 +15,8 @@ class Bopen(object):
 
     def start(self):
         #sub.Popen(cmd_line)
-        self._proc = sub.Popen(self._cmd_line, stdin=sub.PIPE, stdout=sub.PIPE, stderr=sub.PIPE)
+        self._proc = sub.Popen(
+            self._cmd_line, stdin=sub.PIPE, stdout=sub.PIPE, stderr=sub.PIPE)
         self._running = True
         self._thread = threading.Thread(target=self.self_loop, args=())
         self._thread.start()
@@ -53,6 +54,7 @@ class Bopen(object):
 
 def main():
     pass
+
 
 if __name__ == '__main__':
     main()

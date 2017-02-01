@@ -42,21 +42,20 @@ class Iperfjob(object):
     def _done(self):
         self._running = False
         self._log = self._handle.get_output()
-        red.set('log:%s'%self._id_no, ''.join(self._log))
-        red.set('name:%s'%self._id_no, self._name)
-        red.set('type:%s'%self._id_no, self._type)
+        red.set('log:%s' % self._id_no, ''.join(self._log))
+        red.set('name:%s' % self._id_no, self._name)
+        red.set('type:%s' % self._id_no, self._type)
         self._quit = True
 
     def start(self):
         self._running = True
         self._handle.start()
 
-
     def get_name(self):
         name_str = ''
         props = json.loads(self._name)
         for key in props:
-            name_str += '%s -> %s '%(key, props[key])
+            name_str += '%s -> %s ' % (key, props[key])
         #return self._name
         return name_str
 
@@ -71,20 +70,17 @@ class Iperfjob(object):
         return self._log
 
     def get_parsed_dict(self):
-        return {'tput': self._log_parser(self.get_log()),
-                'running': self._running}
+        return {
+            'tput': self._log_parser(self.get_log()),
+            'running': self._running
+        }
 
     def get_log_dict(self):
         self._log = self._handle.get_output()
-        return {'type': self._type,
-                'log': self._log,
-                'running': self._running
-                }
+        return {'type': self._type, 'log': self._log, 'running': self._running}
 
     def get_state(self):
-        return {'type': self._type,
-                'running': self._running
-                }
+        return {'type': self._type, 'running': self._running}
 
     def is_running(self):
         return self._running
@@ -100,53 +96,43 @@ class Iperftcp(Iperfjob):
         self._duration = duration
         self._destination = destination
         self._pairs = pairs
-        self._handle = Bopen(['iperf',
-                              '-c', destination,
-                              '-P', str(pairs),
-                              '-t', str(duration),
-                              '-i', '1',
-                              '-f', 'm'], self._done)
+        self._handle = Bopen([
+            'iperf', '-c', destination, '-P', str(pairs), '-t', str(duration),
+            '-i', '1', '-f', 'm'
+        ], self._done)
 
 
 class Iperfudp(Iperfjob):
-    def __init__(self, id_no, destination, duration=10, bw=1,
-                 name=''):
+    def __init__(self, id_no, destination, duration=10, bw=1, name=''):
         Iperfjob.__init__(self, id_no, name=name)
         self._type = 'udp_client'
         self._duration = duration
         self._destination = destination
         self._bw = bw
-        self._handle = Bopen(['iperf',
-                              '-c', destination,
-                              '-b', str(bw) + 'm',
-                              '-t', str(duration),
-                              '-i', '1',
-                              '-f', 'm'], self._done)
+        self._handle = Bopen([
+            'iperf', '-c', destination, '-b', str(bw) + 'm', '-t',
+            str(duration), '-i', '1', '-f', 'm'
+        ], self._done)
 
 
 class Iperfudps(Iperfjob):
     def __init__(self, id_no, name=''):
         Iperfjob.__init__(self, id_no, name=name)
         self._type = 'udp_server'
-        self._handle = Bopen(['iperf',
-                              '-s',
-                              '-u',
-                              '-i', '1',
-                              '-f', 'm'], self._done)
+        self._handle = Bopen(['iperf', '-s', '-u', '-i', '1', '-f', 'm'],
+                             self._done)
 
 
 class Iperftcps(Iperfjob):
     def __init__(self, id_no, name=''):
         Iperfjob.__init__(self, id_no, name=name)
         self._type = 'tcp_server'
-        self._handle = Bopen(['iperf',
-                              '-s',
-                              '-i', '1',
-                              '-f', 'm'], self._done)
+        self._handle = Bopen(['iperf', '-s', '-i', '1', '-f', 'm'], self._done)
 
 
 def main():
     pass
+
 
 if __name__ == '__main__':
     main()

@@ -15,6 +15,7 @@ red = redis.StrictRedis()
 JOBLIST = {}
 JOBLOCK = threading.Lock()
 
+
 @app.route("/ipc.sh", methods=['GET'])
 def ipc_sh():
     with JOBLOCK:
@@ -25,8 +26,11 @@ def ipc_sh():
             if cmd == 'udp_listener_list':
                 ret['udp_listeners'] = []
                 for key in JOBLIST:
-                    if JOBLIST[key].is_running() and JOBLIST[key].get_type() == 'udp_server':
-                        ret['udp_listeners'].append({'port': JOBLIST[key].get_port()})
+                    if JOBLIST[key].is_running() and JOBLIST[
+                            key].get_type() == 'udp_server':
+                        ret['udp_listeners'].append({
+                            'port': JOBLIST[key].get_port()
+                        })
                 return jsonify(ret)
         return jsonify({})
 
@@ -108,10 +112,15 @@ def tcp_start():
     with JOBLOCK:
         global JOBLIST
 
-        if ('dest' in request.args) and ('dur' in request.args) and ('pair' in request.args):
+        if ('dest' in request.args) and ('dur' in request.args) and (
+                'pair' in request.args):
             ID_NO = red.incr('id_no')
-            newjob = Iperftcp(ID_NO, request.args['dest'], int(request.args['dur']),
-                              int(request.args['pair']), name=request.args['name'])
+            newjob = Iperftcp(
+                ID_NO,
+                request.args['dest'],
+                int(request.args['dur']),
+                int(request.args['pair']),
+                name=request.args['name'])
             newjob.start()
             JOBLIST[ID_NO] = newjob
             ret = {'result': 'success', 'id_no': ID_NO}
@@ -126,10 +135,15 @@ def udp_start():
     with JOBLOCK:
         global JOBLIST
 
-        if ('dest' in request.args) and ('dur' in request.args) and ('bw' in request.args):
+        if ('dest' in request.args) and ('dur' in request.args) and (
+                'bw' in request.args):
             ID_NO = red.incr('id_no')
-            newjob = Iperfudp(ID_NO, request.args['dest'], int(request.args['dur']),
-                              int(request.args['bw']), name=request.args['name'])
+            newjob = Iperfudp(
+                ID_NO,
+                request.args['dest'],
+                int(request.args['dur']),
+                int(request.args['bw']),
+                name=request.args['name'])
             newjob.start()
             JOBLIST[ID_NO] = newjob
             ret = {'result': 'success', 'id_no': ID_NO}
@@ -184,7 +198,7 @@ def hello():
                     props = json.loads(entry)
                     name_str = ""
                     for key in props:
-                        name_str += '%s -> %s '%(key, props[key])
+                        name_str += '%s -> %s ' % (key, props[key])
                     item['name'] = name_str
                     item['running'] = False
                     joblist[id_no] = item
@@ -201,12 +215,14 @@ def before_request():
 def teardown_request(exception):
     pass
 
+
 def cleanup():
     global JOBLIST
     for job in JOBLIST.values():
         job.stop()
         while not job.did_quit():
             pass
+
 
 if __name__ == "__main__":
     atexit.register(cleanup)

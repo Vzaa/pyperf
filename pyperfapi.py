@@ -1,13 +1,15 @@
 import json
 import requests
 
-URLS = {'info': '/get_info',
-        'log': '/get_log',
-        'stop': '/stop',
-        'tcp_start': '/tcp_start',
-        'udp_start': '/udp_start',
-        'tcp_server': '/tcp_server',
-        'udp_server': '/udp_server'}
+URLS = {
+    'info': '/get_info',
+    'log': '/get_log',
+    'stop': '/stop',
+    'tcp_start': '/tcp_start',
+    'udp_start': '/udp_start',
+    'tcp_server': '/tcp_server',
+    'udp_server': '/udp_server'
+}
 
 
 def udp_server_start(hostname, port, name=dict()):
@@ -71,6 +73,6 @@ def stop(hostname, port, id_no):
 def main():
     pass
 
+
 if __name__ == '__main__':
     main()
-
